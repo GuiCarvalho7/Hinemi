@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devocional Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "premium-gold": {
+                DEFAULT: "#D4AF37",
+                light: "#F3E5AB",
+                dark: "#996515",
+                accent: "#C5A028", // From Journal's accent-gold
+              },
+              "background-dark": "#0A0A0A",
+              "card-dark": "#121212",
+              "text-white": "#F5F5F5", // General primary text in dark mode
+              "text-muted": "#A3A3A3", // General secondary/muted text in dark mode
+              "accent-surface": "#1E1E1E", // Used in devotional for audio player and reflection cards
+              "surface-dark": "#16161A", // General surface color for cards, inputs
+              "surface-lighter": "#24242A", // Lighter surface for subtle variations
+              "on-surface-dark": "#2A2A2A", // For slightly elevated elements on surface-dark
+              "gold-primary-dark": "#B5922B", // Specific dark gold from Bible HTML
+              "indigo-400": "#818cf8", // Used in current codebase, keeping it for now
+              "red-500": "#ef4444", // Used in current codebase, keeping it for now
+            },
+            fontFamily: {
+              "display": ["Playfair Display", "serif"], // Main headings, elegant.
+              "serif": ["Cinzel", "serif"], // Very elegant, specific uses (e.g., chapter titles)
+              "sans": ["Inter", "sans-serif"], // Default body text, modern.
+              "poppins": ["Poppins", "sans-serif"], // Alternative sans-serif, for Journal (if needed, otherwise will use Inter)
+              "manrope": ["Manrope", "sans-serif"], // Alternative sans-serif, for Bible (if needed, otherwise will use Inter)
+            },
+            borderRadius: {
+              "DEFAULT": "0.75rem", // Journal default
+              "lg": "1rem",
+              "xl": "1.25rem",
+              "2xl": "1.5rem",
+              "3xl": "2rem", // Devotional example
+              "full": "9999px"
+            },
+            backgroundImage: {
+              'gold-gradient': 'linear-gradient(135deg, var(--tw-colors-premium-gold-DEFAULT) 0%, var(--tw-colors-premium-gold-light) 50%, var(--tw-colors-premium-gold-dark) 100%)',
+              'dark-gradient': 'linear-gradient(180deg, #1A1A1A 0%, var(--tw-colors-background-dark) 100%)',
+              'card-gradient': 'linear-gradient(145deg, #1A1A1A, var(--tw-colors-card-dark))',
+              'gold-text': 'linear-gradient(to right, var(--tw-colors-premium-gold-light), var(--tw-colors-premium-gold-DEFAULT))',
+              'surface-gradient': 'linear-gradient(180deg, rgba(30,30,30,0.6) 0%, rgba(10,10,10,0.9) 100%)',
+              'radial-top-dark': 'radial-gradient(ellipse at top, var(--tw-gradient-stops))', // For Bible screen top blur
+            },
+            boxShadow: {
+              'glow': '0 0 15px rgba(var(--tw-colors-premium-gold-DEFAULT), 0.15)',
+              'card': '0 10px 30px -5px rgba(0, 0, 0, 0.5)',
+              'gold-glow': '0 0 15px rgba(var(--tw-colors-premium-gold-DEFAULT), 0.15)',
+              'card-glow': '0 4px 20px rgba(0,0,0,0.5)',
+              'lg-gold': '0 0 30px rgba(var(--tw-colors-premium-gold-DEFAULT), 0.3)',
+              'xl-gold': '0 0 40px rgba(var(--tw-colors-premium-gold-DEFAULT), 0.5)',
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif; /* Default body font */
+        min-height: max(884px, 100dvh); /* Ensure body takes full viewport height */
+        background-color: #0A0A0A; /* Ensure dark background */
+        color: #F5F5F5; /* Default text color */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      /* Custom scrollbar styles */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0A0A0A; /* Dark background for track */
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333; /* Darker thumb */
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #D4AF37; /* Gold on hover */
+      }
+
+      /* Material Symbols Outlined specific styles */
+      .material-symbols-outlined {
+        font-variation-settings:
+          'FILL' 0,
+          'wght' 300,
+          'GRAD' 0,
+          'opsz' 24
+      }
+      .icon-filled .material-symbols-outlined {
+          font-variation-settings: 'FILL' 1, 'wght' 300;
+      }
+
+      /* Shimmer animation for loading states */
+      .shimmer {
+          background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+          background-size: 200% 100%;
+          animation: shimmer 3s infinite linear;
+      }
+      @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+      }
+
+      /* Gold gradient text */
+      .gold-gradient-text {
+          background: linear-gradient(to right, var(--tw-colors-premium-gold-light), var(--tw-colors-premium-gold-DEFAULT), var(--tw-colors-premium-gold-light));
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          background-size: 200% auto;
+          animation: shine 5s linear infinite;
+      }
+      @keyframes shine {
+          to {
+              background-position: 200% center;
+          }
+      }
+
+      /* Fade-in animation for screen transitions */
+      @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+          animation: fade-in 0.3s ease-out forwards;
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "remark-gfm": "https://aistudiocdn.com/remark-gfm@^4.0.1"
+  }
+}
+</script>
+</head>
+<body class="bg-background-dark text-text-white font-sans antialiased selection:bg-premium-gold/30 selection:text-black">
+    <script>
+      // Polyfill for process.env in browser environments if not provided by bundler
+      if (typeof process === 'undefined') {
+        window.process = { env: {} };
+      }
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
