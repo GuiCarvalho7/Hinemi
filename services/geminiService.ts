@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Modality, GenerateContentResponse } from "@google/genai";
 import { DevotionalContent } from '../types';
 import { GEMINI_AUDIO_MODEL, GEMINI_TEXT_MODEL } from '../constants';
@@ -38,17 +39,14 @@ export async function ensureApiKeySelected(): Promise<string | null> {
 
   if (typeof window.aistudio !== 'undefined' && window.aistudio.hasSelectedApiKey) {
     let hasKey = await window.aistudio.hasSelectedApiKey();
-    if (!hasKey) {
-      console.log('No API key selected, opening selection dialog...');
-      await window.aistudio.openSelectKey();
-      // Assume success after opening dialog, as per guidelines to prevent race condition.
-      // Re-check hasSelectedApiKey or assume process.env.API_KEY is now populated.
-      // For this environment, we must strictly rely on process.env.API_KEY after selection.
+    // Logic removed: Do not automatically open select key dialog.
+    // If the user hasn't selected a key, we just return null and let the UI handle it.
+    if (hasKey) {
+        currentApiKey = process.env.API_KEY || null;
     }
-    currentApiKey = process.env.API_KEY || null;
   } else {
     // If aistudio is not available, assume API_KEY is set via environment for development/testing
-    console.warn('`window.aistudio` is not available. Ensure API_KEY is set via environment variables.');
+    // console.warn('`window.aistudio` is not available. Ensure API_KEY is set via environment variables.');
     currentApiKey = process.env.API_KEY || null;
   }
   return currentApiKey;

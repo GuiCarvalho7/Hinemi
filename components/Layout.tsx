@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import Navbar from './Navbar';
 import { AppScreen, AppContextType } from '../types';
@@ -52,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         console.error("Failed to check or select API key:", error);
         setApiKey(null);
         setApiKeyStatus('missing');
-        setApiError("Erro ao verificar ou selecionar a chave da API. Por favor, tente novamente.");
+        // setApiError("Erro ao verificar ou selecionar a chave da API. Por favor, tente novamente.");
       }
     };
     checkAndSelectKey();
@@ -88,7 +89,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleSelectApiKey = async () => {
-    setApiKeyStatus('checking');
+    // setApiKeyStatus('checking'); // Don't block UI with checking state when manually triggering
     try {
       if (typeof window.aistudio !== 'undefined' && window.aistudio.openSelectKey) {
         await window.aistudio.openSelectKey();
@@ -124,47 +125,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     isNightModeStoryLoading,
     apiKey,
     getApiKey,
+    triggerApiKeySelection: handleSelectApiKey,
   };
 
-  // Display API Key setup ONLY if key is missing/checking, regardless of auth state
+  // Display API Key setup ONLY if key is checking. If 'missing', we allow access.
   if (apiKeyStatus === 'checking') {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background-dark text-text-white">
         <LoadingSpinner />
-        <p className="mt-4 text-lg font-sans">Verificando chave da API...</p>
+        <p className="mt-4 text-lg font-sans">Carregando...</p>
       </div>
     );
   }
 
-  if (apiKeyStatus === 'missing') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-background-dark text-text-white text-center">
-        <h1 className="text-3xl font-display font-bold mb-4">Chave da API Necessária</h1>
-        <p className="mb-6 text-lg font-sans text-text-muted">Para utilizar este aplicativo, por favor, selecione uma chave da API Gemini de um projeto GCP pago.</p>
-        <Button onClick={handleSelectApiKey} variant="primary" className="mb-4">
-          Selecionar Chave da API
-        </Button>
-        {apiError && <p className="text-red-500 mt-2 font-sans">{apiError}</p>}
-        <p className="text-sm mt-4 text-text-muted font-sans">
-          Para mais informações sobre faturamento, visite{' '}
-          <a
-            href="https://ai.google.dev/gemini-api/docs/billing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-premium-gold hover:underline"
-          >
-            ai.google.dev/gemini-api/docs/billing
-          </a>
-        </p>
-      </div>
-    );
-  }
+  // NOTE: Blocking UI for 'missing' apiKeyStatus is removed to allow public access.
 
-  // If API key is present but user is not authenticated, children (AuthScreen) will handle rendering.
-  // If API key is present AND authenticated, render main layout.
+  // If authenticated, render main layout. Otherwise children (typically AppContent) handles AuthScreen.
   if (!isAuthenticated) {
-    // This path means API Key is present, but Auth has not happened yet.
-    // App.tsx's AppContent will render AuthScreen, so we just pass children through.
     return (
       <AppContext.Provider value={contextValue}>
         {children}

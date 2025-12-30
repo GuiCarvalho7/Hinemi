@@ -1,5 +1,4 @@
 
-
 export enum AppScreen {
   Devotional = 'Início',
   Bible = 'Bíblia',
@@ -73,6 +72,7 @@ export interface AppContextType {
   isNightModeStoryLoading: boolean;
   apiKey: string | null;
   getApiKey: () => string | null;
+  triggerApiKeySelection: () => Promise<void>;
 }
 
 export interface AuthContextType {

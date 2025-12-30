@@ -1,10 +1,18 @@
 
-import { BibleBook, BibleTranslation, SpiritualTrack } from './types';
+import { BibleBook, BibleTranslation, SpiritualTrack, DevotionalContent } from './types';
 
 export const GEMINI_TEXT_MODEL = 'gemini-3-pro-preview';
 export const GEMINI_AUDIO_MODEL = 'gemini-2.5-flash-preview-tts';
-// Define a default prompt for devotional generation.
+
 export const DEFAULT_DEVOTIONAL_PROMPT = `Gere um devocional diário inspirador e profundo, focado na palavra de Deus. Inclua um versículo chave, uma reflexão que ilumine a mensagem, uma oração sincera e uma ação prática para o dia. A linguagem deve ser envolvente e que toque o coração.`;
+
+// Conteúdo de exemplo para quando a IA não estiver disponível ou for o primeiro acesso
+export const MOCK_DEVOTIONAL: DevotionalContent = {
+  verse: "Filipenses 4:13",
+  reflection: "A força que Paulo descreve aqui não é uma capacidade física ou mental própria, mas uma infusão divina. Em meio às tempestades, somos sustentados por uma mão invisível que nos capacita a ir além dos nossos limites. Hoje, lembre-se que sua resiliência não vem de você, mas dAquele que te chamou.",
+  prayer: "Senhor, obrigado por ser minha rocha. Quando eu me sentir fraco, que eu possa descansar na Tua força que me impulsiona. Amém.",
+  action: "Identifique um desafio que você tem evitado e dê o primeiro passo hoje, confiando na capacitação divina."
+};
 
 export const BIBLE_BOOKS: BibleBook[] = [
   { name: 'Gênesis', chapters: 50 },
@@ -92,8 +100,8 @@ export const SPIRITUAL_TRACKS: SpiritualTrack[] = [
     progress: 40,
     category: 'Ansiedade',
     daysCount: 30,
-    icon: `<span class="material-symbols-outlined text-lg">lightbulb</span>`, // Icon is not used directly in new design
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDge4dbHXgmk3CjXL0zuh0ZsPe7vYHY6XL-YNQ3KsIWrPgSrHmH2FF8wT7RD_zCBo-MuJWW3Dwe-ZCkpgGTwXTWtBf0MLMLonr4FECbqP9oQw2WCOFDAuCDOl4pGikNUPEr7vvE11bAUmYJh8GNa6ALZi3Avz3B2XFaUUzasrO-jwdUv0vwzkiH30hwDqB-qIAuq-CuROkzBnnAMtNjiOwEubxeyrHOpTaDNaBJ-ykwjkO3v1Mq1mN64K2nLswN2ac5Ma2Sj15iWas'
+    icon: `<span class="material-symbols-outlined">psychology</span>`,
+    imageUrl: 'https://images.unsplash.com/photo-1499209974431-9dac3adaf471?q=80&w=2940&auto=format&fit=crop'
   },
   {
     id: 'proposito',
@@ -102,8 +110,8 @@ export const SPIRITUAL_TRACKS: SpiritualTrack[] = [
     progress: 0,
     category: 'Propósito',
     daysCount: 21,
-    icon: `<span class="material-symbols-outlined text-lg">target</span>`, // Icon is not used directly in new design
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCdRaeOAqnq7n8PrnhQPBU70qcC_XvVWpLRD8epVCvqxDEs3_m4ioW5Qjh0ScTGtSUrsmk6HLEdU0Ua3_n42t-_FdssqnFbmy0aNJqFbzurh2RTcCNLDuEr6QHf_DuHZXlrm_Xg3Ph_MY4FupeB4r8LoPD2NbGNsdQt3M2-hAx4OShXm8Y0gdEI3f-5-L77Bm5uy1DgJxqoaNWydWBxqAPUF58YRWEPWFOMhB_0BgUAtey2yAun015KKg_ZQN_hNujXJrJ5ybqGV84'
+    icon: `<span class="material-symbols-outlined">local_fire_department</span>`,
+    imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2940&auto=format&fit=crop'
   },
   {
     id: 'fe',
@@ -112,8 +120,8 @@ export const SPIRITUAL_TRACKS: SpiritualTrack[] = [
     progress: 0,
     category: 'Fé',
     daysCount: 15,
-    icon: `<span class="material-symbols-outlined text-lg">church</span>`, // Icon is not used directly in new design
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC4ZWxTy-lMi300Vn_bg1S63u251c8aD4uJnHmUlAt1V0oDRPhqXzHDFSU8GUIec2h9IEE98FcNNMdBEX1E2YW1PVKeccJYBiVGzb3V9xs6PU0PVCY4maEqWm6lOfRWtwYlk3zchvVlYdpK9-doPV-9V6mpRkSnpHUhSC1RBLC_mOjmAviLEDw5Xl3kNaTphwoz3nekvEQusrNB3RtTJytW25YH1hUF4N5yYMXU-j2qsxBPfFzqsubdhfit69omz4WWxAPlGGouIvc'
+    icon: `<span class="material-symbols-outlined">shield</span>`,
+    imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=2940&auto=format&fit=crop'
   },
   {
     id: 'gratidao',
@@ -122,29 +130,7 @@ export const SPIRITUAL_TRACKS: SpiritualTrack[] = [
     progress: 100,
     category: 'Gratidão',
     daysCount: 7,
-    icon: `<span class="material-symbols-outlined text-lg">sentiment_satisfied</span>`, // Icon is not used directly in new design
-    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA3yRAu-ZGbg11zKTboJYqux9k1dJz4H8mK5IT1gr6dHXbAkTiWIQDupuUnjhrzIgWd3x9cm2jFPmHDYB2reKUqrK_EghD_KJbyE5PMK9_exL3kNNhjVd50kDGYboktQ4uaQbaLJ5-kSybUEAQJyIpHL6PFHQBZAS5qcNIDx5R1sVU9Wk3k4X5rWOEGIbI3MlH0GijWtiuHHrDCvlpQW8uv_X87d39yDqW0OcWt8asNlQC89fcD2ZI-BR21VOZsWuS_Tr8LmUNVPG8'
-  },
-  {
-    id: 'amor',
-    title: 'O Caminho do Amor',
-    description: 'Aprendendo a amar como Cristo amou.',
-    progress: 0,
-    category: 'Amor',
-    daysCount: 14,
-    // Add missing 'icon' property
-    icon: `<span class="material-symbols-outlined text-lg">favorite</span>`,
-    imageUrl: 'https://images.unsplash.com/photo-1517457210-bf26f49c065e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-  },
-  {
-    id: 'perdao',
-    title: 'A Graça do Perdão',
-    description: 'Experimentando a liberdade de perdoar e ser perdoado.',
-    progress: 0,
-    category: 'Perdão',
-    daysCount: 10,
-    // Add missing 'icon' property
-    icon: `<span class="material-symbols-outlined text-lg">handshake</span>`,
-    imageUrl: 'https://images.unsplash.com/photo-1510972583842-a72049ec608d?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-  },
+    icon: `<span class="material-symbols-outlined">favorite</span>`,
+    imageUrl: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2940&auto=format&fit=crop'
+  }
 ];
