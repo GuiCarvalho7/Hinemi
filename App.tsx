@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Layout, { useAppContext } from './components/Layout';
 import { AppScreen } from './types';
@@ -6,25 +7,19 @@ import BibleScreen from './components/screens/BibleScreen';
 import StudyScreen from './components/screens/StudyScreen';
 import TracksScreen from './components/screens/TracksScreen';
 import JournalScreen from './components/screens/JournalScreen';
-import AuthScreen from './components/screens/AuthScreen'; // Import the new AuthScreen
-import { useAuth, AuthProvider } from './AuthContext'; // Import AuthProvider and useAuth
+import AuthScreen from './components/screens/AuthScreen';
+import { useAuth, AuthProvider } from './AuthContext';
 
 const AppContent: React.FC = () => {
-  const { activeScreen, apiKeyStatus } = useAppContext(); // Get apiKeyStatus from AppContext
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth(); // Get auth state
+  const { activeScreen, apiKeyStatus } = useAppContext();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
-  // If API key is being checked or is missing, show the API key setup flow first
-  if (apiKeyStatus === 'checking' || apiKeyStatus === 'missing') {
-    // Layout component already handles this, so AppContent will simply not render its children
-    return null;
-  }
-
-  // If API key is present but user is not authenticated, show AuthScreen
+  // Se o usuário não está autenticado e o carregamento de autenticação terminou, mostra Auth
   if (!isAuthenticated && !isAuthLoading) {
     return <AuthScreen />;
   }
 
-  // If authenticated, render the main app content
+  // Renderiza a tela ativa. O conteúdo de exemplo é tratado dentro de cada componente de tela.
   const renderScreen = () => {
     switch (activeScreen) {
       case AppScreen.Devotional:
@@ -43,7 +38,6 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    // Add a key to force remounting and trigger CSS animation on screen change
     <div key={activeScreen} className="min-h-full animate-fade-in">
       {renderScreen()}
     </div>
@@ -52,7 +46,7 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider> {/* Wrap Layout with AuthProvider */}
+    <AuthProvider>
       <Layout>
         <AppContent />
       </Layout>

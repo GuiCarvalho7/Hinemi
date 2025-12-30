@@ -3,9 +3,8 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import Navbar from './Navbar';
 import { AppScreen, AppContextType } from '../types';
 import { ensureApiKeySelected, generateNightModeStory as serviceGenerateNightModeStory } from '../services/geminiService';
-import Button from './Button';
 import LoadingSpinner from './LoadingSpinner';
-import { useAuth } from '../AuthContext'; // Import useAuth
+import { useAuth } from '../AuthContext';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -22,55 +21,37 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark'); // Default to dark mode
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [activeScreen, setActiveScreen] = useState<AppScreen>(AppScreen.Devotional);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [apiKeyStatus, setApiKeyStatus] = useState<'checking' | 'missing' | 'present'>('checking');
-  const [apiError, setApiError] = useState<string | null>(null);
   const [nightModeStory, setNightModeStory] = useState<string | null>(null);
   const [isNightModeStoryLoading, setIsNightModeStoryLoading] = useState<boolean>(false);
 
-  const { isAuthenticated } = useAuth(); // Get isAuthenticated state from AuthContext
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Set initial theme to dark mode and ensure class is applied
     document.documentElement.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
-
-    const checkAndSelectKey = async () => {
+    
+    const checkKey = async () => {
       try {
-        setApiKeyStatus('checking');
         const retrievedApiKey = await ensureApiKeySelected();
         if (retrievedApiKey) {
           setApiKey(retrievedApiKey);
           setApiKeyStatus('present');
-          setApiError(null);
         } else {
           setApiKey(null);
           setApiKeyStatus('missing');
         }
-      } catch (error: any) {
-        console.error("Failed to check or select API key:", error);
-        setApiKey(null);
+      } catch (error) {
         setApiKeyStatus('missing');
-        // setApiError("Erro ao verificar ou selecionar a chave da API. Por favor, tente novamente.");
       }
     };
-    checkAndSelectKey();
+    checkKey();
   }, []);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => {
-      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
-      return newTheme;
-    });
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
   const loadNightModeStory = async () => {
@@ -80,8 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         const story = await serviceGenerateNightModeStory(apiKey);
         setNightModeStory(story);
       } catch (err) {
-        console.error('Failed to load night mode story:', err);
-        setNightModeStory('Não foi possível carregar a história do modo noite.');
+        setNightModeStory('Descanse em paz. Deus cuida de você enquanto dorme.');
       } finally {
         setIsNightModeStoryLoading(false);
       }
@@ -89,31 +69,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleSelectApiKey = async () => {
-    // setApiKeyStatus('checking'); // Don't block UI with checking state when manually triggering
-    try {
-      if (typeof window.aistudio !== 'undefined' && window.aistudio.openSelectKey) {
-        await window.aistudio.openSelectKey();
-        const updatedApiKey = process.env.API_KEY || null; // Assume process.env.API_KEY is updated by the platform
-        setApiKey(updatedApiKey);
-        if (updatedApiKey) {
-          setApiKeyStatus('present');
-          setApiError(null);
-        } else {
-          setApiKeyStatus('missing');
-          setApiError("Chave da API não foi selecionada ou não pôde ser recuperada.");
-        }
-      } else {
-        setApiError("A funcionalidade de seleção de chave da API não está disponível.");
-        setApiKeyStatus('missing');
-      }
-    } catch (error: any) {
-      console.error("Error opening API key selection dialog:", error);
-      setApiError("Erro ao abrir o diálogo de seleção da chave da API.");
-      setApiKeyStatus('missing');
+    if (typeof window.aistudio !== 'undefined' && window.aistudio.openSelectKey) {
+      await window.aistudio.openSelectKey();
+      const updatedApiKey = process.env.API_KEY || null;
+      setApiKey(updatedApiKey);
+      if (updatedApiKey) setApiKeyStatus('present');
     }
   };
-
-  const getApiKey = () => apiKey;
 
   const contextValue: AppContextType = {
     theme,
@@ -124,43 +86,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     loadNightModeStory,
     isNightModeStoryLoading,
     apiKey,
-    getApiKey,
+    getApiKey: () => apiKey,
     triggerApiKeySelection: handleSelectApiKey,
   };
 
-  // Display API Key setup ONLY if key is checking. If 'missing', we allow access.
-  if (apiKeyStatus === 'checking') {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background-dark text-text-white">
-        <LoadingSpinner />
-        <p className="mt-4 text-lg font-sans">Carregando...</p>
-      </div>
-    );
-  }
-
-  // NOTE: Blocking UI for 'missing' apiKeyStatus is removed to allow public access.
-
-  // If authenticated, render main layout. Otherwise children (typically AppContent) handles AuthScreen.
-  if (!isAuthenticated) {
-    return (
-      <AppContext.Provider value={contextValue}>
-        {children}
-      </AppContext.Provider>
-    );
-  }
-
   return (
     <AppContext.Provider value={contextValue}>
-      <div className={`relative flex h-auto min-h-screen w-full flex-col bg-background-dark text-text-white font-sans antialiased`}>
-        {/* Background gradient blur effect */}
-        <div className="absolute top-0 left-0 w-full h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-premium-gold/10 via-background-dark/50 to-background-dark pointer-events-none z-0"></div>
-
-        {/* Adjusted pb-48 to account for the new floating bar and Navbar height */}
-        <div className="flex-1 pb-48 custom-scroll overflow-y-auto z-10">
+      {apiKeyStatus === 'checking' ? (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background-dark text-text-white">
+          <LoadingSpinner />
+          <p className="mt-4 text-sm font-sans opacity-50 uppercase tracking-widest">Iniciando HINEMI...</p>
+        </div>
+      ) : !isAuthenticated ? (
+        /* If not authenticated, we just render children (which will be AuthScreen via AppContent) */
+        <div className="min-h-screen bg-background-dark">
           {children}
         </div>
-        <Navbar activeScreen={activeScreen} setActiveScreen={setActiveScreen} theme={theme} />
-      </div>
+      ) : (
+        /* Main Authenticated Layout */
+        <div className="relative flex min-h-screen w-full flex-col bg-background-dark text-text-white font-sans antialiased overflow-x-hidden">
+          <div className="absolute top-0 left-0 w-full h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-premium-gold/10 via-background-dark/50 to-background-dark pointer-events-none z-0"></div>
+          <div className="flex-1 pb-24 z-10">
+            {children}
+          </div>
+          <Navbar activeScreen={activeScreen} setActiveScreen={setActiveScreen} theme={theme} />
+        </div>
+      )}
     </AppContext.Provider>
   );
 };
